@@ -1,0 +1,116 @@
+---
+title: "template"
+author: "Stella Symonds"
+format: html
+execute:
+  message: false # use this to make sure messages don't show up
+  warning: false # use this to make sure warnings don't show up
+---
+
+https://github.com/stellassymonds/ENVS-193DS_spring-2026_final
+
+```{r}
+#| label: read-in-packages-and-data
+# read in packages 
+library(tidyverse) # general use
+library(janitor) # cleaning data frames
+library(here) # file/folder organization
+library(DHARMa)
+
+# read in data
+nests <- read.csv(here("data", "nest_data_final.csv"))
+
+```
+
+# Problem 1
+
+a. Part 1: 
+Part 2: 
+
+b. Part 1: We found evidence to suggest that the distance to water edge does predict probability of American Avocet microhabitat use. 
+
+Part 2: We found evidence to suggest that there is a relationship between American Avocet, Forster’s Tern, and Black-necked Stilt bird species and managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat habitats. 
+
+c. Associated behavior type of either feeding, breeding, or roosting could be a categorical variable that influences the probability of American Avocet microhabitat use. For example, waterbirds that are breeding or roosting may prefer islands wihtin ponds. 
+
+## Problem 2
+
+a. 
+```{r}
+#| label: clean-data
+
+# create new object from nests
+nests_clean <- nests |> 
+  select() |> 
+  
+  
+slice_sample(nests_clean, # data frame to display
+             n = 10) # select ten random rows 
+```
+
+b. 1s mean x and 0s mean y. 
+
+c. Tree height is a X variable. 
+Acacia ant species is a Y variable. 
+
+d. 
+
+e. 
+```{r}
+#| label: run-models
+#| include: false # don't display output 
+
+```
+
+f. 
+```{r}
+
+```
+
+g. 
+```{r}
+#| label: check-diagnostics
+
+```
+
+h. 
+
+i. Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+
+j. 
+```{r}
+#| label: calculate-model-prediction
+
+```
+
+
+k. 
+
+
+## Problem 3
+
+a. How are the visualizations different from each other in the way you have represented your data?
+
+What similarities do you see between all your visualizations?
+
+What patterns (e.g. differences in means/counts/proportions/medians, trends through time, relationships between variables) do you see in each visualization? Are these different between visualizations? If so, why? If not, why not?
+A slight difference in medians between bike rides when I have plans after class and no plans after class is visible in my exploratory visualization, 
+
+My feedback in workshop consisted of possibly adding icons to the end of the lines to represent temperature or another variable. I ultimately decided to not implement this feedback, since neither temperature nor other variables I tracked had any visible affect on my data, and I thought it may make it harder to see the difference between the lengths of each stitched line. 
+
+b. This analysis is appropriate to find a correlation between status of my plans after class and my bike ride durations. 
+one variable is binary 
+
+c. 
+```{r}
+#| label: check-assumptions
+
+```
+
+```{r}
+
+```
+
+
+
+

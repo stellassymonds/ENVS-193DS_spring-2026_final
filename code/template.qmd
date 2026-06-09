@@ -24,7 +24,7 @@ library(MuMIn) # model selection
 
 # read in data
 nests <- read.csv(here("data", "nest_data_final.csv"))
-
+bike_rides <- read.csv(here("data", "bike_rides.csv"))
 ```
 
 ## Problem 1
@@ -186,21 +186,45 @@ k.
 
 ## Problem 3
 
-a. My affective visualization would be impossible to analyze without a key accompanying it. I prioritized creativity over feasibility of understanding. My exploratory visualizations are very easy to understand and make conclusions about. All my visualizations showed close to an equal amount of bike rides when I did and didn't have plans after class and low, medium, or high wind speed. The variation in data was consistent and can be seen in all visualizations. A slight difference in medians between bike rides when I have plans after class and no plans after class is visible in my exploratory visualization, but is not clear in my affective visualization. This is because my data is oriented around a central point in my affective visualization. I don't think a clear association between wind speed and bike ride duration is obvious in any of my visualizations. My feedback in workshop consisted of possibly adding icons to the end of the lines to represent temperature or another variable. I ultimately decided to not implement this feedback, since neither temperature nor other variables I tracked had any visible affect on my data, and I thought it may make it harder to see the difference between the lengths of each stitched line. 
+a. My affective visualization would be impossible to analyze without a key accompanying it. I prioritized creativity over feasibility of understanding. My exploratory visualizations are very easy to understand and make conclusions (or lack thereof) from. All my visualizations showed close to an equal amount of bike rides when I did and didn't have plans after class and low, medium, or high wind speed. The variation in data was consistent and can be seen in all visualizations. A slight difference in medians between bike rides when I have plans after class and no plans after class is visible in my exploratory visualization, but is not clear in my affective visualization. This is because my data is oriented around a central point in my affective visualization. I don't think a clear association between wind speed and bike ride duration is obvious in any of my visualizations. My feedback in workshop consisted of possibly adding icons to the end of the lines to represent temperature or another variable. I ultimately decided to not implement this feedback, since neither temperature nor other variables I tracked had any visible affect on my data, and I thought it may make it harder to see the difference between the lengths of each stitched line. 
 
-b. This analysis is appropriate to find a correlation between status of my plans after class and my bike ride durations. 
-one variable is binary 
+b. A two sample t-test is appropriate to test whether there is a difference in my bike ride durations between two groups, categorized by status of my plans after class (yes/no). My plans status after class is a binary variable, meaning it can be split into two groups, and my bike ride duration is a continuous variable. 
 
 c. 
 ```{r}
 #| label: check-assumptions
+# cleaning data
+bike_rides_clean <- bike_rides |> # create new object from rides
+  clean_names() |> # clean column names
+  # select plans and duration columns
+  select(plans_after_class, duration_seconds)
+
 
 ```
 
 ```{r}
+#| label: t-test
+
 
 ```
 
+d. 
+```{r}
+#| label: visualization
 
+# create new object from bike_rides_clean
+bike_rides_clean_summary <- bike_rides_clean |>
+  group_by(plans_after_class) |>
+  summarize( # what I want in the summary
+    mean = mean(duration_seconds),
+    n = length(duration_seconds), 
+    sd = sd(duration_seconds))
 
+# base layer: ggplot
+ggplot()
+```
+
+e. Figure 2. Bike ride duration dependent on whether I had plans after class. 
+
+f. (two sample t-test, t()=critical, $/alpha$ = 0.05)
 

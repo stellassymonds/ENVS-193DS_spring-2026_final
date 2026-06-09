@@ -1,7 +1,7 @@
 ---
 title: "template"
 author: "Stella Symonds"
-format: html
+format: pdf
 execute:
   message: false # use this to make sure messages don't show up
   warning: false # use this to make sure warnings don't show up
@@ -15,7 +15,9 @@ https://github.com/stellassymonds/ENVS-193DS_spring-2026_final
 library(tidyverse) # general use
 library(janitor) # cleaning data frames
 library(here) # file/folder organization
-library(DHARMa)
+library(DHARMa) # for residual plots 
+library(ggeffects) # getting model predictions
+library(MuMIn) # model selection
 
 # read in data
 nests <- read.csv(here("data", "nest_data_final.csv"))
@@ -35,45 +37,134 @@ c. Associated behavior type of either feeding, breeding, or roosting could be a 
 
 ## Problem 2
 
+```{r}
+#| label: exploring-data
+#| include: false
+
+ggplot(data = nests_clean, # specify data frame
+       mapping = aes(x = case_control, # nest occurrence is x axis
+                     y = height_cm)) + # tree height is y axis
+  # first layer: points
+  geom_point() 
+
+ggplot(data = nests_clean, # specify data frame
+       mapping = aes(x = ant_species, # ant species is x axis
+                     y = height_cm)) + # tree height is y axis
+  # first layer: points
+  geom_point() 
+```
+
 a. 
 ```{r}
 #| label: clean-data
 
 # create new object from nests
 nests_clean <- nests |> 
-  select() |> 
-  
+  # reordering ant species 
+  mutate(ant_species = as_factor(ant_species),
+         ant_species = fct_relevel(ant_species,
+                                    "AB", # C. sjostedti
+                                    "RRB", # C. mimosae
+                                    "BBR")) |> # C. nigriceps
+  # select for preferred columns 
+  select(height_cm, ant_species, case_control) |> 
+  # filter for preferred ant species
+  filter(ant_species %in% c("RRB", "BBR", "AB")) |> 
+  # create new column with full scientific name 
+  mutate(scientific_name = case_when(
+    ant_species == "AB" ~ "C. sjostedti",
+    ant_species == "RRB" ~ "C. mimosae",
+    ant_species == "BBR" ~ "C. nigriceps"))
   
 slice_sample(nests_clean, # data frame to display
              n = 10) # select ten random rows 
 ```
 
-b. 1s mean x and 0s mean y. 
+b. 1s mean that the tree contained a nest and 0s mean the tree did not contain a nest and was available for comparison. 
 
-c. Tree height is a X variable. 
-Acacia ant species is a Y variable. 
+c. Tree height is a continuous variable. As tree height increases, the probability of nest occurrence would increase because they are farther from possible nest predators or disturbances (Results, paragraph 2). 
 
-d. 
+Acacia ant species is a categorical variable. If an ant species is a more aggressive defender, the probability of nest occurrence would increase because the ant species reduces the risk of nest predation (Introduction, paragraph 3). If acacia ants defend against all possible tree disturbances, then the probability of nest occurrence in trees with less aggressive ant species would increase (Introduction, paragraph 3). 
+
+d. 2 models total:
+
+| Model number |  Tree height   |   Ant Species   | Interaction?              |  
+|--------------|:--------------:|:---------------:|:-------------------------:|  
+| 1            |  X             |    X            | no                        | 
+| 2            |  X             |    X            | yes                       |   
 
 e. 
 ```{r}
 #| label: run-models
 #| include: false # don't display output 
 
+# model 1: height and ant species
+model1 <- glm(
+  case_control ~ height_cm + ant_species, # formula: all predictors
+  data = nests_clean, # specify data frame
+  family = "binomial") 
+
+# model 2: height and ant species with interaction term
+model2 <- glm(
+  case_control ~ height_cm * ant_species, # formula: SLA + water treatment
+  data = nests_clean, # specify data frame
+  family = "binomial") 
 ```
 
 f. 
 ```{r}
+#| label: calculating-aic
 
+AICc( # calculating AIC
+  model1,
+  model2) |> 
+  # arranging output in order of AIC 
+  arrange(AICc)
 ```
+
+The best model as determined by Akaike’s Information Criterion (AIC) shows nest occurance as a function of tree height in cm interacting with ant species.  
 
 g. 
 ```{r}
 #| label: check-diagnostics
 
+# generating diagnostic plots for best model (by AIC value) from DHARMa
+plot(
+  simulateResiduals(model2)
+  )
 ```
 
 h. 
+```{r}
+#| label: model-predictions
+
+preds <- ggpredict(
+  model2, # specify model 
+  terms = c("height_cm", "ant_species")) |> 
+  # renaming columns 
+  rename(case_control = x,
+         ant_species = group)
+
+# creating visualization 
+ggplot(data = nests_clean, 
+       mapping = aes(x = case_control,
+                     y = height_cm,
+                     color = case_control)) + 
+  # create separate panels for each species 
+  facet_wrap(~ ant_species) + 
+  geom_jitter(height = 0,
+              width = 0.1,
+              shape = 21) + 
+  geom_pointrange(data = preds,
+                  mapping = aes(x = case_control,
+                                y = predicted,
+                                ymin = conf.low,
+                                ymax = conf.high)) + 
+  theme(legend.position = "none") + # take out legend 
+  labs(x = "Elevation (m)",
+       y = "Mean temperature (\U00B0 C)")
+```
+
 
 i. Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
@@ -89,14 +180,7 @@ k.
 
 ## Problem 3
 
-a. How are the visualizations different from each other in the way you have represented your data?
-
-What similarities do you see between all your visualizations?
-
-What patterns (e.g. differences in means/counts/proportions/medians, trends through time, relationships between variables) do you see in each visualization? Are these different between visualizations? If so, why? If not, why not?
-A slight difference in medians between bike rides when I have plans after class and no plans after class is visible in my exploratory visualization, 
-
-My feedback in workshop consisted of possibly adding icons to the end of the lines to represent temperature or another variable. I ultimately decided to not implement this feedback, since neither temperature nor other variables I tracked had any visible affect on my data, and I thought it may make it harder to see the difference between the lengths of each stitched line. 
+a. My affective visualization would be impossible to analyze without a key accompanying it. I prioritized creativity over feasibility of understanding. My exploratory visualizations are very easy to understand and make conclusions about. All my visualizations showed close to an equal amount of bike rides when I did and didn't have plans after class and low, medium, or high wind speed. The variation in data was consistent and can be seen in all visualizations. A slight difference in medians between bike rides when I have plans after class and no plans after class is visible in my exploratory visualization, but is not clear in my affective visualization. This is because my data is oriented around a central point in my affective visualization. I don't think a clear association between wind speed and bike ride duration is obvious in any of my visualizations. My feedback in workshop consisted of possibly adding icons to the end of the lines to represent temperature or another variable. I ultimately decided to not implement this feedback, since neither temperature nor other variables I tracked had any visible affect on my data, and I thought it may make it harder to see the difference between the lengths of each stitched line. 
 
 b. This analysis is appropriate to find a correlation between status of my plans after class and my bike ride durations. 
 one variable is binary 

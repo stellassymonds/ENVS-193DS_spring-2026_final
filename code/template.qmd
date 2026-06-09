@@ -1,7 +1,10 @@
 ---
-title: "template"
+title: "ENV S 193DS Final"
 author: "Stella Symonds"
-format: pdf
+date: "6/9/26"
+format: 
+  pdf:
+    toc: true # use this to display a table of contents
 execute:
   message: false # use this to make sure messages don't show up
   warning: false # use this to make sure warnings don't show up
@@ -24,14 +27,13 @@ nests <- read.csv(here("data", "nest_data_final.csv"))
 
 ```
 
-# Problem 1
+## Problem 1
 
-a. Part 1: 
-Part 2: 
+a. In part 1, they used a generalized linear model. In part 2, they used a chi-squared test.  
 
 b. Part 1: We found evidence to suggest that the distance to water edge does predict probability of American Avocet microhabitat use. 
 
-Part 2: We found evidence to suggest that there is a relationship between American Avocet, Forster’s Tern, and Black-necked Stilt bird species and managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat habitats. 
+Part 2: We found evidence to suggest that there is a difference between American Avocet, Forster’s Tern, and Black-necked Stilt bird species' habitat preferences of managed pond, non-tidal marsh, salt pond, tidal marsh, or tidal mudflat habitats. 
 
 c. Associated behavior type of either feeding, breeding, or roosting could be a categorical variable that influences the probability of American Avocet microhabitat use. For example, waterbirds that are breeding or roosting may prefer islands wihtin ponds. 
 
@@ -41,13 +43,13 @@ c. Associated behavior type of either feeding, breeding, or roosting could be a 
 #| label: exploring-data
 #| include: false
 
-ggplot(data = nests_clean, # specify data frame
+ggplot(data = nests, # specify data frame
        mapping = aes(x = case_control, # nest occurrence is x axis
                      y = height_cm)) + # tree height is y axis
   # first layer: points
   geom_point() 
 
-ggplot(data = nests_clean, # specify data frame
+ggplot(data = nests, # specify data frame
        mapping = aes(x = ant_species, # ant species is x axis
                      y = height_cm)) + # tree height is y axis
   # first layer: points
@@ -98,15 +100,15 @@ e.
 #| label: run-models
 #| include: false # don't display output 
 
-# model 1: height and ant species
+# model 1: height and ant species, no interaction term
 model1 <- glm(
-  case_control ~ height_cm + ant_species, # formula: all predictors
+  case_control ~ height_cm + ant_species, # formula: height & ant species
   data = nests_clean, # specify data frame
   family = "binomial") 
 
 # model 2: height and ant species with interaction term
 model2 <- glm(
-  case_control ~ height_cm * ant_species, # formula: SLA + water treatment
+  case_control ~ height_cm * ant_species, # formula: height & ant species
   data = nests_clean, # specify data frame
   family = "binomial") 
 ```
@@ -115,23 +117,23 @@ f.
 ```{r}
 #| label: calculating-aic
 
-AICc( # calculating AIC
+AICc( # calculating AIC of both models
   model1,
   model2) |> 
   # arranging output in order of AIC 
   arrange(AICc)
 ```
 
-The best model as determined by Akaike’s Information Criterion (AIC) shows nest occurance as a function of tree height in cm interacting with ant species.  
+The best model as determined by Akaike’s Information Criterion (AIC) shows nest occurrence as a function of tree height in cm interacting with ant species.
 
 g. 
-```{r}
+```{r, fig.width=10, fig.height=6}
 #| label: check-diagnostics
 
 # generating diagnostic plots for best model (by AIC value) from DHARMa
 plot(
   simulateResiduals(model2)
-  )
+  ) 
 ```
 
 h. 
@@ -161,19 +163,23 @@ ggplot(data = nests_clean,
                                 ymin = conf.low,
                                 ymax = conf.high)) + 
   theme(legend.position = "none") + # take out legend 
-  labs(x = "Elevation (m)",
-       y = "Mean temperature (\U00B0 C)")
+  # rename axes with units 
+  labs(x = "Elevation (m)", 
+       y = "Mean temperature (\U00B0 C)") + 
+  # take out gridlines and gray background
+  theme(panel.grid = element_blank()) + 
+  # custom colors
+  scale_color_manual(values = c("1" = "tomato", 
+                                "2" = "purple2"))
 ```
 
-
-i. Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+i. Figure 1. Nest occurrence as a function of tree height in cm interacting with ant species. Describe. Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
 j. 
 ```{r}
 #| label: calculate-model-prediction
 
 ```
-
 
 k. 
 

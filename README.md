@@ -3,7 +3,7 @@ Final assignment for ENV S 193DS
 
 ## General information
 
-This repo includes a research writing example, data analysis including a model of nest occurrence based on tree height and the ant species present, and discussion and analysis of my personal bike ride data.
+This repo includes a research writing example, data analysis including a model of nest occurrence based on tree height and the ant species present, and discussion and analysis of my personal bike ride duration data.
 
 ## Data and file overview
 

@@ -21,6 +21,7 @@ library(here) # file/folder organization
 library(DHARMa) # for residual plots 
 library(ggeffects) # getting model predictions
 library(MuMIn) # model selection
+library(effsize) # effect size
 
 # read in data
 nests <- read.csv(here("data", "nest_data_final.csv"))
@@ -223,9 +224,19 @@ var.test(
 t.test(
   # formula: response variable ~ grouping variable
   duration_seconds ~ plans_after_class,
-  var.equal = FALSE, # argument for unequal variances
+  var.equal = TRUE, # argument for unequal variances
   data = bike_rides_clean)  # bike_rides_clean data frame
 ```
+
+```{r}
+#| label: effect-size
+
+# calculate cohen's d 
+d <- cohen.d(duration_seconds ~ plans_after_class, data = bike_rides_clean)
+
+d # display effect size value 
+```
+
 
 d. 
 ```{r}

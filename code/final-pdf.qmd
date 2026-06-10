@@ -12,6 +12,8 @@ execute:
 
 https://github.com/stellassymonds/ENVS-193DS_spring-2026_final
 
+# Setup
+
 ```{r}
 #| label: read-in-packages-and-data
 # read in packages 
@@ -27,6 +29,8 @@ library(effsize) # effect size
 nests <- read.csv(here("data", "nest_data_final.csv"))
 bike_rides <- read.csv(here("data", "bike_rides.csv"))
 ```
+
+# Problems 
 
 ## Problem 1
 
@@ -99,7 +103,7 @@ d. 2 models total:
 e. 
 ```{r}
 #| label: run-models
-#| include: false # don't display output 
+#| include: false
 
 # model 1: height and ant species, no interaction term
 model1 <- glm(
@@ -140,52 +144,68 @@ plot(
 h. 
 ```{r}
 #| label: model-predictions
-#| eval: false
-#| include: false
 
+# create prediction
 preds <- ggpredict(
   model2, # specify model 
   terms = c("height_cm", "ant_species")) |> 
   # renaming columns 
-  rename(case_control = x,
+  rename(height_cm = x,
          ant_species = group)
 
 # creating visualization 
-ggplot(data = nests_clean, 
-       mapping = aes(x = case_control,
-                     y = height_cm,
-                     color = case_control)) + 
+ggplot(data = nests_clean, # nests_clean data frame
+       mapping = aes(x = height_cm, # x is tree height
+                     y = case_control, # y is nest occurrence
+                     color = ant_species)) + # color by species
   # create separate panels for each species 
   facet_wrap(~ ant_species) + 
+  # first layer: jitterplot to show data
   geom_jitter(height = 0,
               width = 0.1,
-              shape = 21) + 
-  geom_pointrange(data = preds,
-                  mapping = aes(x = case_control,
-                                y = predicted,
-                                ymin = conf.low,
-                                ymax = conf.high)) + 
-  theme(legend.position = "none") + # take out legend 
+              shape = 21) + # open circles
+  # second layer: ribbons for confidence intervals
+  geom_ribbon(data = preds, # specify prediction data frame
+    mapping = aes(x = height_cm, # x axis is height
+                  ymin = conf.low, # lower confidence bound
+                  ymax = conf.high, # higher confidence bound
+                  fill = ant_species), # do by species
+    alpha = 0.25, # semi-transparent so raw data shows through
+    inherit.aes = FALSE) + # don't call from preds aes
+  # third layer: line
+  geom_line(data = preds, # specify prediction data frame
+    mapping = aes(x = height_cm, # x axis is height
+                  y = predicted, # y s predicted values
+                  color = ant_species), # color by ant species
+    linewidth = 1,
+    inherit.aes = FALSE) + # don't call from preds aes
   # rename axes with units 
-  labs(x = "Elevation (m)", 
-       y = "Mean temperature (\U00B0 C)") + 
-  # take out gridlines and gray background
-  theme(panel.grid = element_blank()) + 
-  # custom colors
-  scale_color_manual(values = c("1" = "tomato", 
-                                "2" = "purple2"))
+  labs(x = "Tree height (cm)", 
+       y = "Probability of nest occurrence") + 
+  theme(panel.grid = element_blank()) + # take out gridlines 
+  theme_classic() + # bye gray background
+  theme(legend.position = "none") + # taking out legend
+  # custom colors for lines and confidence intervals
+  scale_color_manual(values = c("RRB" = "tomato", 
+                                "AB" = "skyblue2", 
+                               "BBR" = "lightgreen")) + 
+  scale_fill_manual(values = c("RRB" = "tomato", 
+                                "AB" = "skyblue2", 
+                               "BBR" = "lightgreen")) 
 ```
 
-i. Figure 1. Nest occurrence as a function of tree height in cm interacting with ant species. Describe. Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
+i. Figure 1. Probability of nest occurrence as a function of tree height in cm interacting with ant species. Open circles represent individual observations. Lines represent model predictions. Transparent ribbons represent a 95% confidence interval. Blue represents ant species C. sjostedti (AB), red represents C. mimosae (RRB), and green represents C. nigriceps (BBR). Lujan, E., Nielsen, R., Short, Z., Wicks, S., Nderitu Watetu, W., Malingati Khasoha, L., Palmer, T. M., Goheen, J. R., & Alston, J. M. (2023). Data, code, and metadata for: Symbiotic acacia ants drive nesting behavior by birds in an African savanna [Data set]. Zenodo. https://doi.org/10.5281/zenodo.8373322
 
 j. 
 ```{r}
 #| label: calculate-model-prediction
 
+# calculate probability of nest occurrence at height = 600 cm
+ggpredict(model2, # specify model
+  terms = c("height_cm[600]", "ant_species")) # "predictor" and numerical predictor value in brackets, then predict for each species
 ```
 
-k. 
-
+k. Predicted probability of nest site occupancy at a tree height of 600 cm is 0.20 for C. sjostedti (AB), 0.74 for C. mimosae (RRB), and 1.00 for C. nigriceps (BBR). As tree height increases, probability of nest occurrence generally increases. This effect interacts with higher probabilities of nest occurrence in the presence of more aggressive ant species, C. nigriceps and C. mimosae. C. nigriceps (BBR) is the most aggressive, and has the steepest slope in the figure from part h. Aggressive ants reduce the risk of nest predation, increasing lifetime bird fitness. 
 
 ## Problem 3
 
@@ -196,6 +216,7 @@ b. A two sample t-test is appropriate to test whether there is a difference in m
 c. 
 ```{r}
 #| label: check-assumptions
+
 # cleaning data
 bike_rides_clean <- bike_rides |> # create new object from rides
   clean_names() |> # clean column names
@@ -237,7 +258,6 @@ d <- cohen.d(duration_seconds ~ plans_after_class, data = bike_rides_clean)
 d # display effect size value 
 ```
 
-
 d. 
 ```{r}
 #| label: visualization
@@ -251,11 +271,40 @@ bike_rides_clean_summary <- bike_rides_clean |>
     sd = sd(duration_seconds)) |>
   ungroup() # ungroup the data frame
 
-# base layer: ggplot
-ggplot()
+# start with the bike_rides_clean data frame
+ggplot(data = bike_rides_clean, 
+       # x-axis should be plans after class yes/no
+       # y-axis should be duration in seconds 
+       # coloring by plans after class
+       mapping = aes(x = plans_after_class, 
+                     y = duration_seconds, 
+                     color = plans_after_class)) + 
+   # first layer: jitterplot
+   geom_jitter(height = 0, # no jitter in vertical direction
+              width = 0.2, # small horizontal jitter
+              shape = 21) + # open circle shape 
+  # second layer: represent means for each group
+  stat_summary(geom = "point",
+               fun = mean,
+               size = 3) + # make points bigger
+  # third layer: bars to represent standard deviation
+  geom_errorbar(data = bike_rides_clean_summary, # use summary data frame
+                mapping = aes(x = plans_after_class, 
+                              y = mean, # assign axes based on summary frame
+                              ymin = mean - sd, 
+                              ymax = mean + sd,
+                width = 0.1)) + # make the bars narrower
+  # relabelling x- and y-axes
+  labs(x = "Plans after class", 
+       y = "Bike ride duration (seconds)") + 
+  theme_light() + # custom theme
+  # custom colors
+  scale_color_manual(values = c("yes" = "darkblue",
+                                "no" = "red3")) +
+  theme(legend.position = "none") # taking out legend
 ```
 
-e. Figure 2. Bike ride duration dependent on whether I had plans after class. 
+e. Figure 2. Bike ride duration in seconds dependent on whether I had plans after class. Open circles represent individual observations and large dots represent group means. The bars represent one standard deviation away from the mean in the positive and negative direction. Red corresponds with no plans after class, and blue corresponds with plans after class. 
 
-f. (two sample t-test, t()=critical, $/alpha$ = 0.05)
+f. We did not find evidence to suggest that whether I had plans after class has an effect on my mean bike ride durations (two sample t-test, t(28) = 1.59, p=0.12, $\alpha$ = 0.05). On average, my bike ride durations in seconds when I didn't have plans after class (n=15, mean=359) were slightly longer than when I did have plans after class (n=15, mean=344). Having plans after class had a moderate effect on my bike ride durations (Cohen's d = 0.58), but the difference in means may have occurred by chance. 
 

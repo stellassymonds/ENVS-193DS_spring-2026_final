@@ -13,4 +13,4 @@ The `data` folder includes the nest occurrence data file and my bike ride durati
 
 ## Rendered output
 
-The rendered output for HW 3 is ![here](https://github.com/stellassymonds/ENVS-193DS_spring-2026_final/blob/main/code/final-pdf.pdf).
+The rendered output for HW 3 is [here](https://github.com/stellassymonds/ENVS-193DS_spring-2026_final/blob/main/code/final-pdf.pdf).

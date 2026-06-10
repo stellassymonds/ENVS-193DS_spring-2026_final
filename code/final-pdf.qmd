@@ -10,7 +10,7 @@ execute:
   warning: false # use this to make sure warnings don't show up
 ---
 
-https://github.com/stellassymonds/ENVS-193DS_spring-2026_final
+[Link to my repo](https://github.com/stellassymonds/ENVS-193DS_spring-2026_final)
 
 # Setup
 
@@ -142,7 +142,7 @@ plot(
 ```
 
 h. 
-```{r}
+```{r, fig.width=10, fig.height=6}
 #| label: model-predictions
 
 # create prediction

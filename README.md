@@ -7,9 +7,9 @@ This repo includes a research writing example, data analysis including a model o
 
 ## Data and file overview
 
-The code folder includes all code.
+The `code` folder includes all code.
 
-The data folder includes the nest occurrence data file and my bike ride durations data file.
+The `data` folder includes the nest occurrence data file and my bike ride durations data file.
 
 ## Rendered output
 

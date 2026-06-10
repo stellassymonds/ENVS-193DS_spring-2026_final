@@ -139,6 +139,8 @@ plot(
 h. 
 ```{r}
 #| label: model-predictions
+#| eval: false
+#| include: false
 
 preds <- ggpredict(
   model2, # specify model 
@@ -212,19 +214,17 @@ ggplot(data = bike_rides_clean, # starting data frame
 # check variances with F test of equal variances
 var.test(
   duration_seconds ~ plans_after_class, # formula: response variable ~ grouping variable
-  data = urchins_clean) # data: urchins-clean data frame
+  data = bike_rides_clean) # bike_rides_clean data frame
 ```
 
 ```{r}
 #| label: t-test
 
 t.test(
-# formula: response variable ~ grouping variable
-weight_g ~ experimental_treatment,
-# argument for unequal variances
-var.equal = FALSE,
-# data: bike_rides_clean data frame
-data = bike_rides_clean)
+  # formula: response variable ~ grouping variable
+  duration_seconds ~ plans_after_class,
+  var.equal = FALSE, # argument for unequal variances
+  data = bike_rides_clean)  # bike_rides_clean data frame
 ```
 
 d. 
